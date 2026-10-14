@@ -36,8 +36,6 @@
 //!
 //! DO NOT add any other way to create these types (e.g. a `Default` impl or a public constructor).
 
-#![expect(unused)]
-
 /// Trait for getting the [`Platform`] for a specific CPU architecture.
 ///
 /// Implemented by [`Platform`] itself, and all types representing specific CPU feature sets.
