@@ -5,14 +5,37 @@ use crate::{
     token::{is_trivia_byte, matches_tk, tk},
 };
 
-use crate::pipeline::chunk::{eqm, load64};
+use crate::pipeline::{
+    chunk::{eqm, load64},
+    platform::Generic,
+};
 
-use super::common::{emit_value, invalid_diags};
+use super::{
+    common::{emit_value, invalid_diags},
+    compress_impl,
+};
 
-/// Dummy no-op `init_pair_luts` function.
-/// Generic build does not use `PairLuts`, so it's not necessary to construct it.
-#[inline(always)]
-pub fn init_pair_luts_generic() {}
+/// [`compress`] for all generic platforms (no AVX2, no Neon).
+///
+/// [`compress_impl`] is inlined into it. `#[inline(never)]` so it stays a separate function.
+///
+/// [`compress`]: super::compress
+#[inline(never)]
+pub(super) unsafe fn compress_generic(
+    src: &[u8],
+    n: usize,
+    nb: usize,
+    st: *const u64,
+    kind: *const u8,
+    stage_pos: *mut u32,
+    stage_kind: *mut u8,
+    out_kinds: *mut u8,
+    out_spans: *mut Span,
+    lanes: &mut Lanes,
+    feat: Generic,
+) -> usize {
+    compress_impl(src, n, nb, st, kind, stage_pos, stage_kind, out_kinds, out_spans, lanes, feat)
+}
 
 pub(super) unsafe fn compress_blocks_generic(
     st: *const u64,
